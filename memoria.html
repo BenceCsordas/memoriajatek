@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        :root{
+            --colNr:4;
+            --cell:100px;
+        }
+        #game-board{
+            display: grid;
+            grid-template-columns: repeat(var(--colNr),var(--cell));
+            gap:3px;
+        }
+        .card{
+            width: var(--cell);
+            height: var(--cell);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: blanchedalmond;
+            font-size: 2rem;
+        }
+        body{
+            display: flex;
+            justify-content: center;
+            
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="radiogombok">
+            <div><input  checked type="radio" name="boardSize" value="4">4</div>
+        <div><input type="radio" name="boardSize" value="8">8</div>
+        <div><input type="radio" name="boardSize" value="10">10</div>
+    <button onclick="read()" id="start">start</button>
+    <button onclick="reset()" id="reset">reset</button>
+    
+        </div>
+        
+        <div id="game-board"></div>
+    </div>
+    
+
+    <script src="util.js"></script>
+
+    <script>
+        
+        
+        //document.body.style.setProperty('--colNr', 10)
+        //document.body.style.setProperty('--cell', 32+"px")
+
+        
+        let wwidth = window.innerWidth
+        console.log(wwidth)
+        let flipped=[]
+        let locked=false
+
+        let emojiArray = [];
+
+        function flipCard(domObj){
+            console.log(flipped);
+            console.log(domObj.id.slice(1));
+            let index=domObj.id.slice(1)          
+            if(flipped.length<2 && domObj.textContent=='?'){
+                domObj.textContent=emojiArray[index]
+                flipped.push(index)
+                if(flipped.length==2){
+                    //locked=true
+                    setTimeout(check,1000)
+                }
+            }
+        }
+        function check(){
+            //let i1=flipped[0]
+            //let i2=flipped[1]
+            let [i1,i2]=flipped
+            
+            if(emojiArray[i1]!=emojiArray[i2]){
+                document.getElementById(`e${i1}`).textContent='?'
+                document.getElementById(`e${i2}`).textContent='?'
+                
+            }
+      
+            flipped=[]
+            let count=0
+            document.querySelectorAll('.card').forEach(obj=>{
+                if(obj.textContent!='?') count++
+            })
+            if(count==emojiArray.length) alert('Nyertél!')
+        }
+        function read(){
+        document.getElementById("start").disabled = true
+        let size=+document.querySelector('input[type="radio"]:checked').value
+        console.log(size);
+        emojiArray = emojisArr(size*size/2)
+        document.body.style.setProperty('--colNr', size)
+        emojiArray = [...emojiArray, ...emojiArray]
+        console.log((wwidth-25)/size)
+        document.body.style.setProperty('--cell', `${(wwidth-27)/size}px`)
+        
+        emojiArray.forEach((item,index)=>{
+            document.getElementById('game-board').innerHTML+=`
+                <div class="card" id="e${index}" onclick="flipCard(this)">?</div>
+            `
+        })
+        console.log(emojiArray)
+
+    }
+        
+    function reset() {
+        document.getElementById("start").disabled = false
+        document.getElementById("game-board").innerHTML = ''
+    }
+    </script>
+</body>
+</html>
